@@ -1051,10 +1051,14 @@
         function rollAttack(name, bonus, damage, effect) {
             // Converter o bônus para número
             const bonusValue = parseInt(bonus.replace('+', ''));
-            
-            // Rolagem do d20
+
+            // Rolagem principal do d20
             const attackRoll = Math.floor(Math.random() * 20) + 1;
             const totalAttack = attackRoll + bonusValue;
+
+            // Rolagem secundária para vantagem/desvantagem
+            const advRoll = Math.floor(Math.random() * 20) + 1;
+            const advTotal = advRoll + bonusValue;
             
             // Calcular dano
             let damageResult = 0;
@@ -1095,15 +1099,22 @@
             resultContent.innerHTML = `
                 <div class="mb-4">
                     <div class="text-lg font-bold text-gray-800 mb-3">${name}</div>
-                    
-                    <div class="mb-4 p-3 bg-gray-50 rounded border border-gray-200">
-                        <div class="font-bold text-gray-700 mb-2">ROLAGEM DE ATAQUE</div>
-                        <div class="text-center">
-                            <div class="dice-total">${totalAttack}</div>
-                            <div class="text-sm text-gray-600">${attackRoll} + ${bonusValue}</div>
+                    <div class="mb-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <div class="p-3 bg-gray-50 rounded border border-gray-200 flex-1">
+                            <div class="font-bold text-gray-700 mb-2">ROLAGEM DE ATAQUE</div>
+                            <div class="text-center">
+                                <div class="dice-total">${totalAttack}</div>
+                                <div class="text-sm text-gray-600">${attackRoll} + ${bonusValue}</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded border border-gray-200 flex-1">
+                            <div class="font-bold text-gray-700 mb-2">VANT/DESVANT</div>
+                            <div class="text-center">
+                                <div class="dice-total">${advTotal}</div>
+                                <div class="text-sm text-gray-600">${advRoll} + ${bonusValue}</div>
+                            </div>
                         </div>
                     </div>
-                    
                     <div class="p-3 bg-gray-50 rounded border border-gray-200">
                         <div class="font-bold text-gray-700 mb-2">ROLAGEM DE DANO</div>
                         <div class="text-center">
@@ -1111,14 +1122,12 @@
                             <div class="text-sm text-gray-600">${damageDetails}${damageRollsText}</div>
                         </div>
                     </div>
-                    
                     ${effect ? `
                     <div class="mt-4 p-3 bg-gray-50 rounded border border-gray-200">
                         <div class="font-bold text-gray-700 mb-2">EFEITO ESPECIAL</div>
                         <div>${effect}</div>
                     </div>
                     ` : ''}
-                    
                     <div class="mt-4 text-center text-sm text-gray-600 italic">
                         O ataque acerta se ${totalAttack} ≥ CA do alvo
                     </div>
