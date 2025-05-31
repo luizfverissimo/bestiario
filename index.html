@@ -296,6 +296,16 @@
                 Gerencie criaturas para suas aventuras - role dados e controle combates
             </p>
         </header>
+        <!-- Botões de Exportar/Importar Monstros -->
+        <div class="flex justify-end gap-2 mb-4">
+            <button id="exportBtn" class="btn-outline py-2 px-4 rounded flex items-center">
+                <i class="fas fa-file-export mr-2"></i> Exportar Monstros
+            </button>
+            <input type="file" id="importInput" accept="application/json" style="display:none" />
+            <button id="importBtn" class="btn-outline py-2 px-4 rounded flex items-center">
+                <i class="fas fa-file-import mr-2"></i> Importar Monstros
+            </button>
+        </div>
 
         <!-- Barra de busca e controles -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
@@ -487,6 +497,48 @@
     </div>
 
     <script>
+        // Exportar monstros para arquivo JSON
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
+            const importInput = document.getElementById('importInput');
+            exportBtn.addEventListener('click', function() {
+                const data = localStorage.getItem('shadowdark-bestiary');
+                if (data) {
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'monstros-shadowdark.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } else {
+                    alert('Nenhum monstro encontrado para exportar.');
+                }
+            });
+            importBtn.addEventListener('click', function() {
+                importInput.value = '';
+                importInput.click();
+            });
+            importInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const monstros = JSON.parse(e.target.result);
+                        if (!Array.isArray(monstros)) throw new Error('Formato inválido');
+                        localStorage.setItem('shadowdark-bestiary', JSON.stringify(monstros));
+                        window.location.reload();
+                    } catch (err) {
+                        alert('Arquivo inválido!');
+                    }
+                };
+                reader.readAsText(file);
+            });
+        });
         // Dados iniciais do bestiário
         let bestiary = JSON.parse(localStorage.getItem('shadowdark-bestiary')) || [
             {
